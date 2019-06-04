@@ -1,0 +1,55 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: tracing
+  namespace: {{ .Release.Namespace }}
+spec:
+  host: tracing.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: istio-private
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+  - "*.{{ .Values.dnsDomainSuffixPrivate }}"
+  gateways:
+  - {{ .Release.Namespace }}/istio-private
+  http:
+  - match:
+    - authority:
+        exact: istio-grafana.{{ .Values.dnsDomainSuffixPrivate }}
+    route:
+    - destination:
+        host: grafana.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: 3000
+  - match:
+    - authority:
+        exact: istio-prometheus.{{ .Values.dnsDomainSuffixPrivate }}
+    route:
+    - destination:
+        host: prometheus.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: 9090
+  - match:
+    - authority:
+        exact: kiali.{{ .Values.dnsDomainSuffixPrivate }}
+    route:
+    - destination:
+        host: kiali.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: 20001
+  - match:
+    - authority:
+        exact: tracing.{{ .Values.dnsDomainSuffixPrivate }}
+    route:
+    - destination:
+        host: tracing.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: 80
+---

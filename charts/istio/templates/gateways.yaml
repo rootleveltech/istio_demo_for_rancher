@@ -1,0 +1,72 @@
+{{- if .Values.publicGateway }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-public
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    istio: gateway-public
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    # NOTE: external dns chart discovers Istio Gateway hosts and creates DNS records
+    #       automagically.  Currently not supported for VirtualServices
+    - "*.{{ .Values.dnsDomainSuffixPublic }}"
+    tls:
+      httpsRedirect: {{ .Values.httpsRedirect }}
+{{- if .Values.httpsRedirect }}
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+    hosts:
+     #NOTE: external dns chart discovers Istio Gateway hosts and creates DNS records
+     #      automagically.  Currently not supported for VirtualServices
+    - "*.{{ .Values.dnsDomainSuffixPublic }}"
+{{- end }}
+{{- end }}
+---
+{{- if .Values.privateGateway }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-private
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    istio: gateway-private
+  servers:
+  - port:
+      number: 80
+      name: http
+#TODO: test protocol HTTP2
+      protocol: HTTP
+    hosts:
+    # NOTE: external dns chart discovers Istio Gateway hosts and creates DNS records
+    #       automagically.  Currently not supported for VirtualServices
+    - "*.{{ .Values.dnsDomainSuffixPrivate }}"
+    tls:
+      httpsRedirect: {{ .Values.httpsRedirect }}
+{{- if .Values.httpsRedirect }}
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+    hosts:
+#     NOTE: external dns chart discovers Istio Gateway hosts and creates DNS records
+#           automagically.  Currently not supported for VirtualServices
+    - "*.{{ .Values.dnsDomainSuffixPrivate }}"
+{{- end }}
+{{- end }}

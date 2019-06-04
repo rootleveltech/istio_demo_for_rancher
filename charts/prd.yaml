@@ -1,0 +1,20 @@
+dnsDomainSuffixPrivate: int-rancher-demo.rootleveltech.com
+dnsDomainSuffixPublic: rancher-demo.rootleveltech.com
+googleProject: braden-rancher-demo
+
+################################################################################
+# DNS Chart
+################################################################################
+public-dns:
+  google:
+    project: braden-rancher-demo
+    serviceAccountSecret: "external-dns-service-account"
+  domainFilters: [ "rancher-demo.rootleveltech.com" ]
+  txtOwnerId: prd-braden-rancher-demo-public
+
+private-dns:
+  google:
+    project: braden-rancher-demo
+    serviceAccountSecret: "external-dns-service-account"
+  domainFilters: [ "int-rancher-demo.rootleveltech.com" ]
+  txtOwnerId: int-prd-braden-rancher-demo

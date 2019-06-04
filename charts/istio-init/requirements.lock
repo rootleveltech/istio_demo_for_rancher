@@ -1,0 +1,6 @@
+dependencies:
+- name: istio-init
+  repository: file://../../istio/install/kubernetes/helm/istio-init
+  version: 1.1.0
+digest: sha256:6ca95263189a22b5bcf7576440ff1f58c0ba2209e8bbe24e2af2d863e8bee633
+generated: 2019-05-30T22:24:56.217092-05:00

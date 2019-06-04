@@ -1,0 +1,15 @@
+{{- if .Values.serviceEntry }}
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: {{ template "istio.fullname" . }}-api-test
+spec:
+  hosts:
+  - quotes.rest
+  ports:
+  - name: http
+    number: 80
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+{{- end }}

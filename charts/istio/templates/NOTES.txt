@@ -1,0 +1,12 @@
+Private Virtual Service Endpoints
+----------------------------------
+kubectl get --namespace istio-system -o jsonpath='{range .spec.http[*]}{"-"}{@.match[0].authority.exact}{"\n"}{end}' virtualservices istio-private
+
+
+To find renewal schedule for the certificates, you can check the cert manager logs by running this command:
+kubectl -n istio-system logs deployment/certmanager -f
+
+Restart gateway pods so they get new SSL cert, this needs to be done every 60-90 days
+Cert Manager fetches a new cert every 60 days and cert is valid for 90 days:
+
+kubectl -n istio-system delete pods -l istio=ingressgateway

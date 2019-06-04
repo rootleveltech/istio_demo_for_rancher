@@ -1,0 +1,30 @@
+# Default values for external-dns.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# NOTE: This template is rendered by Terraform
+
+public-dns:
+  extraArgs:
+    istio-ingress-gateway: istio-system/istio-gateway-public
+  policy: sync
+  provider: google
+  rbac:
+    create: true
+  sources:
+    - service
+    - ingress
+    - istio-gateway
+  txtOwnerId: public
+
+private-dns:
+  extraArgs:
+    istio-ingress-gateway: istio-system/istio-gateway-private
+  policy: upsert-only
+  provider: google
+  rbac:
+    create: true
+  sources:
+    - service
+    - ingress
+    - istio-gateway
+  txtOwnerId: private
