@@ -13,13 +13,10 @@ cd ~/digistore24/istio/install/kubernetes/helm/istio-init
 helm upgrade --install istio-init . --namespace istio-system
 ```
 
-### Activate Auto Envoy Side Car Injection By Namespace
-
-```shell
-kubectl label namespace default istio-injection=enabled
-```
-
 ### Create Secret for Kiali login
+
+Should move this to Terraform code:
+
 ```
 $ echo -n 'admin' | base64
 YWRtaW4=
@@ -66,34 +63,26 @@ By default only `service`, `ingress` sources are enabled, this is b/c external-d
 
 Access WebUI, you can find the url via:
 
-http://tracing.live-int.ds25.io/jaeger/search
-http://tracing.dev-int.ds25.io/jaeger/search
+http://tracing.int-rancher-demo.rootleveltech.com/jaeger/search
 
 ### Kiali
 
 Access WebUI, you can find the url via:
 
-http://kiali.live-int.ds25.io/kiali/console/overview 
-http://kiali.dev-int.ds25.io/kiali/console/overview 
+http://kiali.int-rancher-demo.rootleveltech.com/kiali/console/overview 
 
 Login User/Password was created earlier via K8s Secret
 
 ### Prometheus
 
-http://istio-prometheus.live-int.ds25.io
-http://istio-prometheus.dev-int.ds25.io
+http://istio-prometheus.int-rancher-demo.rootleveltech.com
 
-
-### Service Graph
-
-http://servicegraph.live-int.ds25.io/force/forcegraph.html
-http://servicegraph.dev-int.ds25.io/force/forcegraph.html
 
 ### Istio CertManager
 
 IAM Service Account is created via Terraform [here](https://gitlab.com/ds24/infra/blob/master/infrastructure/modules/dns/iam.tf#L1-18), a K8s secret with the Service Account Creds is created [here](https://gitlab.com/ds24/infra/blob/master/infrastructure/modules/dns/main.tf#L12-21)
 
-#### After Helm install you should see a renewal scheduled for each certificate after its been renewed.  Currently there should be 2 per Istio install istio-system/istio-istio-gateway-private and istio-system/istio-istio-gateway-public which respectively renew certs for *.live-int.ds25.io *.live.ds25.io in env-prod and *.dev-int.ds25.io *.dev.ds25.io in env-dev
+#### After Helm install you should see a renewal scheduled for each certificate after its been renewed.  Currently there should be 2 per Istio install istio-system/istio-istio-gateway-private and istio-system/istio-istio-gateway-public which respectively renew certs for *.rancher-demo.rootleveltech.com and *.int-rancher-demo.rootleveltech.com
 
 ```
 kubectl -n istio-system logs deployment/certmanager -f
@@ -109,6 +98,6 @@ I0215 23:22:11.617190       1 controller.go:185] certificates controller: Finish
 ```
 # Restart gateway pods so they get new SSL cert, this needs to be done every 60-90 days
 # Cert Manager fetches a new cert every 60 days and cert is valid for 90 days
-kubectl -n istio-system delete pods -l istio=ingressgateway
+kubectl -n istio-system delete pods -l chart=gateways
 ```
 
