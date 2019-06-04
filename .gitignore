@@ -1,0 +1,9 @@
+.DS_Store
+credentials.json
+gcs-credentials.json
+credentials-*.json
+.terraform
+*.tfstate*
+*.swp
+local.auto.tfvars
+istio/*
