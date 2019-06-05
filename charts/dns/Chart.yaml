@@ -1,0 +1,3 @@
+description: A Helm chart for External DNS Chart, it sync DNS records to Googles CloudDNS
+name: dns
+version: 0.1.0

@@ -1,0 +1,168 @@
+# Default values for istio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+letsEncryptEmail: ssladmin@rootleveltech.com
+letsEncryptAPIServer: https://acme-staging-v02.api.letsencrypt.org/directory
+
+publicGateway: true
+privateGateway: true
+serviceEntry: false
+
+httpsRedirect: true
+certmanager:
+  enabled: true
+
+global:
+  proxy:
+    logLevel: error
+  tag: master-20190603-09-16
+
+prometheus:
+  enabled: true
+
+grafana:
+  enabled: true
+
+kiali:
+  enabled: false
+
+tracing:
+  enabled: false
+
+istio:
+  pilot:
+    traceSampling: 100
+  gateways:
+    istio-ingressgateway:
+      # Disable Default Gateway and create our own
+      enabled: false
+
+    istio-gateway-public:
+      enabled: true
+      #
+      # Secret Discovery Service (SDS) configuration for ingress gateway.
+      #
+      sds:
+        # If true, ingress gateway fetches credentials from SDS server to handle TLS connections.
+        enabled: false
+        # SDS server that watches kubernetes secrets and provisions credentials to ingress gateway.
+        # This server runs in the same pod as ingress gateway.
+        image: node-agent-k8s
+      labels:
+        app: istio-gateway-public
+        istio: gateway-public
+      replicaCount: 1
+      autoscaleMin: 1
+      autoscaleMax: 5
+      resources: {}
+        # limits:
+        #  cpu: 100m
+        #  memory: 128Mi
+        #requests:
+        #  cpu: 1800m
+        #  memory: 256Mi
+      cpu:
+        targetAverageUtilization: 80
+      podDisruptionBudget: {}
+        # minAvailable: 1
+        # maxUnavailable: 1
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      externalIPs: []
+      serviceAnnotations: {}
+      podAnnotations: {}
+      type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
+      externalTrafficPolicy: Local #change to Local to preserve source IP or Cluster for default behaviour or leave commented out
+      ports:
+        ## You can add custom gateway ports
+      - port: 80
+        targetPort: 80
+        name: http2
+#TODO: see about removing node port, when I did hc to all nodes was passing, when its here only hc to node that has relevant istio gateway 
+#      was passing.  Also when all hc passed ingress did not seem to work.  NodePorts must be unique of the collide when trying to bind to K8s node.
+        nodePort: 31380
+      - port: 443
+        name: https
+#TODO: see about removing node port, when I did hc to all nodes was passing, when its here only hc to node that has relevant istio gateway 
+##      was passing.  Also when all hc passed ingress did not seem to work.  NodePorts must be unique of the collide when trying to bind to K8s node.
+        nodePort: 31390
+      secretVolumes:
+      - name: ingressgateway-certs
+        secretName: istio-ingressgateway-certs
+        mountPath: /etc/istio/ingressgateway-certs
+      - name: ingressgateway-ca-certs
+        secretName: istio-ingressgateway-ca-certs
+        mountPath: /etc/istio/ingressgateway-ca-certs
+      ### Advanced options ############
+      env:
+        # A gateway with this mode ensures that pilot generates an additional
+        # set of clusters for internal services but without Istio mTLS, to
+        # enable cross cluster routing.
+        ISTIO_META_ROUTER_MODE: "sni-dnat"
+      nodeSelector: {}
+  
+    istio-gateway-private:
+      enabled: true
+      #
+      # Secret Discovery Service (SDS) configuration for ingress gateway.
+      #
+      sds:
+        # If true, ingress gateway fetches credentials from SDS server to handle TLS connections.
+        enabled: false
+        # SDS server that watches kubernetes secrets and provisions credentials to ingress gateway.
+        # This server runs in the same pod as ingress gateway.
+        image: node-agent-k8s
+      labels:
+        app: istio-gateway-private
+        istio: gateway-private
+      replicaCount: 1
+      autoscaleMin: 1
+      autoscaleMax: 5
+      resources: {}
+        # limits:
+        #  cpu: 100m
+        #  memory: 128Mi
+        #requests:
+        #  cpu: 1800m
+        #  memory: 256Mi
+      cpu:
+        targetAverageUtilization: 80
+      podDisruptionBudget: {}
+        # minAvailable: 1
+        # maxUnavailable: 1
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      externalIPs: []
+      serviceAnnotations:
+        cloud.google.com/load-balancer-type: "Internal"
+      podAnnotations: {}
+      type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
+      externalTrafficPolicy: Local #change to Local to preserve source IP or Cluster for default behaviour or leave commented out
+      ports:
+        ## You can add custom gateway ports
+      - port: 80
+        targetPort: 80
+        name: http2
+#TODO: see about removing node port, when I did hc to all nodes was passing, when its here only hc to node that has relevant istio gateway 
+#      was passing.  Also when all hc passed ingress did not seem to work.  NodePorts must be unique of the collide when trying to bind to K8s node.
+        nodePort: 31381
+      - port: 443
+        name: https
+#TODO: see about removing node port, when I did hc to all nodes was passing, when its here only hc to node that has relevant istio gateway 
+#      was passing.  Also when all hc passed ingress did not seem to work.  NodePorts must be unique of the collide when trying to bind to K8s node.
+        nodePort: 31391
+      secretVolumes:
+      - name: ingressgateway-certs
+        secretName: istio-ingressgateway-private-certs
+        mountPath: /etc/istio/ingressgateway-certs
+      - name: ingressgateway-ca-certs
+        secretName: istio-ingressgateway-private-ca-certs
+        mountPath: /etc/istio/ingressgateway-ca-certs
+      ### Advanced options ############
+      env:
+        # A gateway with this mode ensures that pilot generates an additional
+        # set of clusters for internal services but without Istio mTLS, to
+        # enable cross cluster routing.
+        ISTIO_META_ROUTER_MODE: "sni-dnat"
+      nodeSelector: {}

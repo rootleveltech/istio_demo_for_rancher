@@ -1,0 +1,77 @@
+{{- if .Values.certmanager.enabled -}}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: {{ .Release.Name }}-letsencrypt-private
+  namespace: {{ .Release.Namespace }}
+spec:
+  acme:
+    server: {{ .Values.letsEncryptAPIServer }}
+    email: {{ .Values.letsEncryptEmail }}
+    privateKeySecretRef:
+      name: {{ .Release.Name }}-letsencrypt-private
+    dns01:
+      providers:
+      - name: cloud-dns
+        clouddns:
+          serviceAccountSecretRef:
+            name: istio-cert-manager-credentials
+            key: gcp-dns-admin.json
+          project: {{ .Values.googleProject }}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-istio-gateway-private
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: istio-ingressgateway-private-certs
+  issuerRef:
+    name: {{ .Release.Name }}-letsencrypt-private
+  commonName: "*.{{ .Values.dnsDomainSuffixPrivate }}"
+  acme:
+    config:
+    - dns01:
+        provider: cloud-dns
+      domains:
+      - "*.{{ .Values.dnsDomainSuffixPrivate }}"
+      - "{{ .Values.dnsDomainSuffixPrivate }}"
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: {{ .Release.Name }}-letsencrypt-public
+  namespace: {{ .Release.Namespace }}
+spec:
+  acme:
+    server: {{ .Values.letsEncryptAPIServer }}
+    email: {{ .Values.letsEncryptEmail }}
+    privateKeySecretRef:
+      name: {{ .Release.Name }}-letsencrypt-public
+    dns01:
+      providers:
+      - name: cloud-dns
+        clouddns:
+          serviceAccountSecretRef:
+            name: istio-cert-manager-credentials
+            key: gcp-dns-admin.json
+          project: {{ .Values.googleProject }}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-istio-gateway-public
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: istio-ingressgateway-certs
+  issuerRef:
+    name: {{ .Release.Name }}-letsencrypt-public
+  commonName: "*.{{ .Values.dnsDomainSuffixPublic }}"
+  acme:
+    config:
+    - dns01:
+        provider: cloud-dns
+      domains:
+      - "*.{{ .Values.dnsDomainSuffixPublic }}"
+      - "{{ .Values.dnsDomainSuffixPublic }}"
+{{- end -}}

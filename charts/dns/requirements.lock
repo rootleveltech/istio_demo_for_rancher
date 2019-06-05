@@ -1,0 +1,9 @@
+dependencies:
+- name: external-dns
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 1.7.8
+- name: external-dns
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 1.7.8
+digest: sha256:e4374219143329e6427eeffbb455ba8f840d6da90ed8c5e517ab3cb87eeef742
+generated: 2019-06-03T19:44:02.783179-05:00
