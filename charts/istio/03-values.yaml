@@ -7,7 +7,7 @@ global:
     logLevel: error
   tag: master-20190603-09-16
 
-letsEncryptEmail: ssladmin@digistore24.team
+letsEncryptEmail: ssladmin@rootleveltech.com
 letsEncryptAPIServer: https://acme-staging-v02.api.letsencrypt.org/directory
 
 publicGateway: true

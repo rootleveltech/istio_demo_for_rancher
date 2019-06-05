@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-letsEncryptEmail: ssladmin@digistore24.team
+letsEncryptEmail: ssladmin@rootleveltech.com
 letsEncryptAPIServer: https://acme-staging-v02.api.letsencrypt.org/directory
 
 publicGateway: true
