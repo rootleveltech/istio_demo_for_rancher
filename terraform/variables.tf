@@ -4,12 +4,12 @@ variable "env" {
 
 variable "gcp_credentials_json" {
   description = "GCP Credentials Json to allow access to GCP, I use a symlink"
-  default = "credentials-braden-rancher-demo.json"
+  default = "credentials--rancher-istio-demo.json"
 }
 
 variable "project" {
   description = "The GCP Project to create Terraform Resources in"
-  default = "braden-rancher-demo"
+  default = "rancher-istio-demo"
 }
 
 variable "region" {
